@@ -56,7 +56,7 @@ const httpListener = (req, res) => {
         data: todos,
       })
     );
-  } else if (req.url.startsWith ("/todos") && req.method == "PATCH") {
+  } else if (req.url.startsWith ("/todos/") && req.method == "PATCH") {
     //read req data
     let body = "";
     req.on("data", (chunk) => (body += chunk));
@@ -84,7 +84,7 @@ const httpListener = (req, res) => {
         errorHandle(res, "資料格式有誤");
       }
     });
-  } else if (req.url.startsWith ("/todos") && req.method == "DELETE") {
+  } else if (req.url.startsWith ("/todos/") && req.method == "DELETE") {
     const inTodoId = req.url.split("/").pop();
     const findIdx = todos.findIndex((item) => item.id === inTodoId);
     if (findIdx !== -1) {
@@ -99,6 +99,16 @@ const httpListener = (req, res) => {
     } else {
       errorHandle(res, "查無此id資料，DELETE 失敗");
     }
+  }else if (req.url=="/todos" && req.method == "DELETE") {
+    
+      todos.length = 0;
+      res.writeHead(200, httpHeader);
+      res.end(
+        JSON.stringify({
+          status: true,
+          data: todos,
+        })
+      );
   }else {
     res.writeHead(200, httpHeader);
     res.end(
