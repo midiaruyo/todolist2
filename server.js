@@ -84,7 +84,22 @@ const httpListener = (req, res) => {
         errorHandle(res, "資料格式有誤");
       }
     });
-  } else {
+  } else if (req.url.startsWith ("/todos") && req.method == "DELETE") {
+    const inTodoId = req.url.split("/").pop();
+    const findIdx = todos.findIndex((item) => item.id === inTodoId);
+    if (findIdx !== -1) {
+      todos.splice(findIdx, 1);
+      res.writeHead(200, httpHeader);
+      res.end(
+        JSON.stringify({
+          status: true,
+          data: todos,
+        })
+      );
+    } else {
+      errorHandle(res, "查無此id資料，DELETE 失敗");
+    }
+  }else {
     res.writeHead(200, httpHeader);
     res.end(
       JSON.stringify({
