@@ -42,7 +42,7 @@ const httpListener = (req, res) => {
             })
           );
         } else {
-          errorHandle(res, "讀取不到title資料");
+          errorHandle(res, "讀取不到title資料，POST失敗");
         }
       } catch (error) {
         errorHandle(res, "資料格式有誤");
@@ -56,6 +56,34 @@ const httpListener = (req, res) => {
         data: todos,
       })
     );
+  } else if (req.url.startsWith ("/todos") && req.method == "PATCH") {
+    //read req data
+    let body = "";
+    req.on("data", (chunk) => (body += chunk));
+    //end read data，process data to res
+    req.on("end", () => {
+      try {
+        const title = JSON.parse(body).title;
+        const inTodoId = req.url.split("/").pop();
+        const findIdx = todos.findIndex((item) => item.id === inTodoId);
+
+        if (title !== undefined && findIdx !== -1) {
+          todos[findIdx].title = title;
+
+          res.writeHead(200, httpHeader);
+          res.end(
+            JSON.stringify({
+              status: true,
+              data: todos,
+            })
+          );
+        } else {
+          errorHandle(res, "讀取不到title資料，PATCH 失敗");
+        }
+      } catch (error) {
+        errorHandle(res, "資料格式有誤");
+      }
+    });
   } else {
     res.writeHead(200, httpHeader);
     res.end(
